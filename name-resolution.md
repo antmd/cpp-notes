@@ -36,7 +36,7 @@ Quirk #1 of template functions
 One quirk when working with template functions that does not affect non-template functions is that such function calls have the
 potential to be seen by the compiler as not function calls at all!
 
-This can happen when making a call with explicit template parameters:
+This can happen when making a call with explicit template parameters to a template member function:
 
 ```
 make_thing<42>("hello");
@@ -66,6 +66,17 @@ of definitions it has already seen, then
 
 That's not the way a real compiler works, but it's *as if* it does. If at any stage above, no remaining matches can be found
 then the compiler exits with an error.
+
+The above example isn't a big problem, because the compiler will usually complain about 'make_thing' as not declared anywhere, so the problem becomes obvious.
+
+When `make_thing` is a template member function that *is* declared, the compiler still must assume that the first angle-bracket is a 'less-than' operator, unless told otherwise.
+
+In the case of template member functions, we use the `template` qualifier on the function call:
+```
+obj->template make_thing<42>("hello");
+```
+
+If we omit this, we'll get an error about illegal comparison between a function pointer and an integer (although newer compilers may also helpfully include a hint about the `template` keyword).
 
 Quirk #2 of Template Functions
 -------
